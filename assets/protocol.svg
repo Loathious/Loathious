@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="338" viewBox="0 0 840 338" role="img" aria-labelledby="t d">
+<title id="t">How Protocol works</title><desc id="d">An append-only training log feeds an athlete model of seven parameters, each pulled from a population prior toward the athlete's own data. The model derives today's session: exact load and reps per set. Logging the session feeds the next derivation.</desc>
+<style>@font-face{font-family:"GeistSB";font-weight:600;src:url(data:font/woff2;base64,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) format("woff2")}.sb{font-family:"GeistSB",system-ui,-apple-system,"Segoe UI",sans-serif;font-weight:600;font-feature-settings:"tnum"}@font-face{font-family:"GeistRg";font-weight:400;src:url(data:font/woff2;base64,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) format("woff2")}.rg{font-family:"GeistRg",system-ui,-apple-system,"Segoe UI",sans-serif;font-weight:400;font-feature-settings:"tnum"}@font-face{font-family:"GeistMo";font-weight:400;src:url(data:font/woff2;base64,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) format("woff2")}.mo{font-family:"GeistMo",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-weight:400;font-feature-settings:"tnum"}</style>
+<defs><radialGradient id="lit1" cx="0.5" cy="-0.35" r="0.9"><stop offset="0" stop-color="#5a2216" stop-opacity="0.55"/><stop offset="0.45" stop-color="#2e140e" stop-opacity="0.28"/><stop offset="1" stop-color="#0f0b0a" stop-opacity="0"/></radialGradient><filter id="glow2" filterUnits="userSpaceOnUse" x="-60" y="-60" width="960" height="458" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="7"/></filter><filter id="glow3" filterUnits="userSpaceOnUse" x="-60" y="-60" width="960" height="458" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="3"/></filter><filter id="glow4" filterUnits="userSpaceOnUse" x="-60" y="-60" width="960" height="458" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="4"/></filter></defs>
+<rect x="0.5" y="0.5" width="839" height="337" rx="18" fill="#0f0b0a"/>
+<rect x="0.5" y="0.5" width="839" height="337" rx="18" fill="url(#lit1)"/>
+<rect x="0.5" y="0.5" width="839" height="337" rx="18" fill="none" stroke="#2c1f1c"/>
+<rect x="28.5" y="70.5" width="215" height="195" rx="12" fill="#181110" stroke="#3e2c27" stroke-width="1"/>
+<text x="44" y="97" class="sb" font-size="14" fill="#f0e6da">Training log</text>
+<text x="44" y="115" class="rg" font-size="12" fill="#b3a397">Append-only facts</text>
+<rect x="40.5" y="132.5" width="191" height="25" rx="7" fill="#211714" stroke="#2c1f1c" stroke-width="1"/>
+<text x="50" y="149.2" class="rg" font-size="12" fill="#b3a397">Squat</text>
+<text x="222" y="149.2" class="mo" font-size="11.5" fill="#f0e6da" text-anchor="end">100 kg × 8</text>
+<rect x="40.5" y="163.5" width="191" height="25" rx="7" fill="#211714" stroke="#2c1f1c" stroke-width="1"/>
+<text x="50" y="180.2" class="rg" font-size="12" fill="#b3a397">Squat</text>
+<text x="222" y="180.2" class="mo" font-size="11.5" fill="#f0e6da" text-anchor="end">100 kg × 7</text>
+<rect x="40.5" y="194.5" width="191" height="25" rx="7" fill="#211714" stroke="#2c1f1c" stroke-width="1"/>
+<text x="50" y="211.2" class="rg" font-size="12" fill="#b3a397">Check-in</text>
+<text x="222" y="211.2" class="mo" font-size="11.5" fill="#f0e6da" text-anchor="end">sleep 7 h</text>
+<rect x="40.5" y="225.5" width="191" height="25" rx="7" fill="#211714" stroke="#2c1f1c" stroke-width="1"/>
+<text x="50" y="242.2" class="rg" font-size="12" fill="#b3a397">Weigh-in</text>
+<text x="222" y="242.2" class="mo" font-size="11.5" fill="#f0e6da" text-anchor="end">78.4 kg</text>
+<rect x="292" y="30" width="256" height="266" rx="12" fill="none" stroke="#9e2b1e" stroke-width="7" stroke-opacity="0.45" filter="url(#glow2)"/>
+<rect x="292.5" y="30.5" width="255" height="265" rx="12" fill="#181110" stroke="#b8402b" stroke-width="1"/>
+<text x="308" y="57" class="sb" font-size="14" fill="#f0e6da">Athlete model</text>
+<text x="308" y="75" class="rg" font-size="12" fill="#b3a397">Your data, shrunk toward priors</text>
+<line x1="475" y1="100" x2="475" y2="270" stroke="#86746a" stroke-dasharray="2 4"/>
+<text x="475" y="94" class="mo" font-size="10" fill="#86746a" text-anchor="middle">prior</text>
+<text x="308" y="120" class="rg" font-size="12" fill="#b3a397">Strength</text>
+<line x1="420" y1="116" x2="530" y2="116" stroke="#3e2c27"/>
+<line x1="475" y1="116" x2="493.7" y2="116" stroke="#d44a31" stroke-width="2"/>
+<rect x="472" y="113" width="6" height="6" fill="#181110" stroke="#86746a"/>
+<rect x="488.2" y="110.5" width="11" height="11" fill="#c7813b" fill-opacity="0.55" filter="url(#glow3)"/>
+<rect x="490.2" y="112.5" width="7" height="7" fill="#c7813b" stroke="#c7813b" stroke-width="1.25"/>
+<text x="308" y="144" class="rg" font-size="12" fill="#b3a397">Fatigue</text>
+<line x1="420" y1="140" x2="530" y2="140" stroke="#3e2c27"/>
+<line x1="475" y1="140" x2="462.9" y2="140" stroke="#d44a31" stroke-width="2"/>
+<rect x="472" y="137" width="6" height="6" fill="#181110" stroke="#86746a"/>
+<rect x="457.4" y="134.5" width="11" height="11" fill="#c7813b" fill-opacity="0.55" filter="url(#glow3)"/>
+<rect x="459.4" y="136.5" width="7" height="7" fill="#c7813b" stroke="#c7813b" stroke-width="1.25"/>
+<text x="308" y="168" class="rg" font-size="12" fill="#b3a397">RIR calibration</text>
+<line x1="420" y1="164" x2="530" y2="164" stroke="#3e2c27"/>
+<line x1="475" y1="164" x2="497" y2="164" stroke="#d44a31" stroke-width="2"/>
+<rect x="472" y="161" width="6" height="6" fill="#181110" stroke="#86746a"/>
+<rect x="491.5" y="158.5" width="11" height="11" fill="#c7813b" fill-opacity="0.55" filter="url(#glow3)"/>
+<rect x="493.5" y="160.5" width="7" height="7" fill="#c7813b" stroke="#c7813b" stroke-width="1.25"/>
+<text x="308" y="192" class="rg" font-size="12" fill="#b3a397">Dose–response</text>
+<line x1="420" y1="188" x2="530" y2="188" stroke="#3e2c27"/>
+<line x1="475" y1="188" x2="458.5" y2="188" stroke="#d44a31" stroke-width="2"/>
+<rect x="472" y="185" width="6" height="6" fill="#181110" stroke="#86746a"/>
+<rect x="453" y="182.5" width="11" height="11" fill="#c7813b" fill-opacity="0.55" filter="url(#glow3)"/>
+<rect x="455" y="184.5" width="7" height="7" fill="#c7813b" stroke="#c7813b" stroke-width="1.25"/>
+<text x="308" y="216" class="rg" font-size="12" fill="#b3a397">Recovery</text>
+<line x1="420" y1="212" x2="530" y2="212" stroke="#3e2c27"/>
+<line x1="475" y1="212" x2="483.8" y2="212" stroke="#d44a31" stroke-width="2"/>
+<rect x="472" y="209" width="6" height="6" fill="#181110" stroke="#86746a"/>
+<rect x="478.3" y="206.5" width="11" height="11" fill="#c7813b" fill-opacity="0.55" filter="url(#glow3)"/>
+<rect x="480.3" y="208.5" width="7" height="7" fill="#c7813b" stroke="#c7813b" stroke-width="1.25"/>
+<text x="308" y="240" class="rg" font-size="12" fill="#b3a397">Adherence</text>
+<line x1="420" y1="236" x2="530" y2="236" stroke="#3e2c27"/>
+<line x1="475" y1="236" x2="454.1" y2="236" stroke="#d44a31" stroke-width="2"/>
+<rect x="472" y="233" width="6" height="6" fill="#181110" stroke="#86746a"/>
+<rect x="448.6" y="230.5" width="11" height="11" fill="#c7813b" fill-opacity="0.55" filter="url(#glow3)"/>
+<rect x="450.6" y="232.5" width="7" height="7" fill="#c7813b" stroke="#c7813b" stroke-width="1.25"/>
+<text x="308" y="264" class="rg" font-size="12" fill="#b3a397">Affinity</text>
+<line x1="420" y1="260" x2="530" y2="260" stroke="#3e2c27"/>
+<line x1="475" y1="260" x2="489.3" y2="260" stroke="#d44a31" stroke-width="2"/>
+<rect x="472" y="257" width="6" height="6" fill="#181110" stroke="#86746a"/>
+<rect x="483.8" y="254.5" width="11" height="11" fill="#c7813b" fill-opacity="0.55" filter="url(#glow3)"/>
+<rect x="485.8" y="256.5" width="7" height="7" fill="#c7813b" stroke="#c7813b" stroke-width="1.25"/>
+<rect x="596.5" y="70.5" width="215" height="195" rx="12" fill="#181110" stroke="#3e2c27" stroke-width="1"/>
+<text x="612" y="97" class="sb" font-size="14" fill="#f0e6da">Today</text>
+<text x="612" y="115" class="rg" font-size="12" fill="#b3a397">Derived on every read</text>
+<rect x="608.5" y="132.5" width="191" height="25" rx="7" fill="#211714" stroke="#2c1f1c" stroke-width="1"/>
+<text x="618" y="149.2" class="rg" font-size="12" fill="#b3a397">Set 1</text>
+<text x="790" y="149.2" class="mo" font-size="11.5" fill="#e3a863" text-anchor="end">102.5 kg × 8</text>
+<rect x="608.5" y="163.5" width="191" height="25" rx="7" fill="#211714" stroke="#2c1f1c" stroke-width="1"/>
+<text x="618" y="180.2" class="rg" font-size="12" fill="#b3a397">Set 2</text>
+<text x="790" y="180.2" class="mo" font-size="11.5" fill="#e3a863" text-anchor="end">102.5 kg × 8</text>
+<rect x="608.5" y="194.5" width="191" height="25" rx="7" fill="#211714" stroke="#2c1f1c" stroke-width="1"/>
+<text x="618" y="211.2" class="rg" font-size="12" fill="#b3a397">Set 3</text>
+<text x="790" y="211.2" class="mo" font-size="11.5" fill="#e3a863" text-anchor="end">102.5 kg × 7</text>
+<text x="612" y="247" class="rg" font-size="12" fill="#b3a397">Squat, stop 1 rep short</text>
+<path d="M244 168L290 168" fill="none" stroke="#9e2b1e" stroke-width="5" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow4)"/>
+<path d="M244 168L290 168" fill="none" stroke="#d44a31" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M290 168L282 172L282 164Z" fill="#d44a31"/>
+<circle cx="244" cy="168" r="3.25" fill="#0f0b0a" stroke="#d44a31" stroke-width="1.25"/>
+<path d="M548 168L594 168" fill="none" stroke="#9e2b1e" stroke-width="5" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow4)"/>
+<path d="M548 168L594 168" fill="none" stroke="#d44a31" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M594 168L586 172L586 164Z" fill="#d44a31"/>
+<circle cx="548" cy="168" r="3.25" fill="#0f0b0a" stroke="#d44a31" stroke-width="1.25"/>
+<path d="M704 266L704 308Q704 318 694 318L146 318Q136 318 136 308L136 268" fill="none" stroke="#86746a" stroke-width="1.25" stroke-linecap="round" stroke-dasharray="4 5"/>
+<path d="M136 268L140 276L132 276Z" fill="#86746a"/>
+<circle cx="704" cy="266" r="3.25" fill="#0f0b0a" stroke="#86746a" stroke-width="1.25"/>
+<rect x="275.6" y="310" width="288.8" height="20" fill="#0f0b0a"/>
+<text x="420" y="322" class="rg" font-size="12" fill="#b3a397" text-anchor="middle">You train, the result is logged, the plan re-derives</text>
+</svg>
