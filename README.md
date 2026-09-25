@@ -1,60 +1,99 @@
-<h1 align="center">Hi 👋, I'm Alfred</h1>
-<h3 align="center">Student · VFX artist · SaaS animation · AI</h3>
+<p><img src="assets/header.svg" width="100%" alt="Hi 👋, I'm Alfred. Student, VFX artist, SaaS animation, AI."></p>
+
+<p><b>Stack</b><br><img src="https://skillicons.dev/icons?i=ae%2Cpr%2Cau%2Cblender%2Cpy%2Cvercel%2Cfastapi%2Chtml%2Ccss%2Cjs&theme=dark" width="462" alt="After Effects, Premiere Pro, Audition, Blender, Python, Vercel, FastAPI, HTML, CSS, JavaScript"></p>
+
+<p><b>Learning</b><br><img src="https://skillicons.dev/icons?i=cpp%2Cts%2Cnextjs&theme=dark" width="134" alt="C++, TypeScript, Next.js"></p>
 
 ## Overshoot
 
 I make motion for software: launch films, demo videos and product animation that moves the way a good interface feels to use. Everything is keyframed by hand in After Effects, often on real interfaces rebuilt layer by layer. Booking from Q1 2027.
 
-<p><img src="assets/overshoot.svg" width="100%" alt="A scale curve in a graph editor that springs past 100 percent to 112, dips below and settles, next to the same interface element drawn at four frames of the move."></p>
+<p><a href="https://overshootfx.com"><img src="assets/overshoot-banner.svg" width="100%" alt="The Overshoot wordmark next to an icon of an animation curve that overshoots its target and settles."></a></p>
 
-<p><picture><source media="(prefers-color-scheme: dark)" srcset="assets/button-overshoot-dark.svg"><a href="https://overshootfx.com"><img src="assets/button-overshoot-light.svg" height="98" alt="overshootfx.com"></a></picture></p>
+[overshootfx.com](https://overshootfx.com)
 
 ## Selected projects
 
-<p><img src="assets/stats.svg" width="100%" alt="Across all my repositories, 14 May to 24 Sep 2026: 335 commits, 61k lines of code, 590+ tests, 6 repositories. Commits per week peak at 47. Languages: TypeScript 69%, JavaScript 12%, Python 8%, HTML 6%, CSS 2%, C++ 2%, other 1%."></p>
+<p><img src="assets/stats.svg" alt="Commit and language stats across my repositories, updated daily."></p>
 
 ### Protocol
 
-A strength-training coach built on a statistical model of the athlete. It reads an append-only training log and works out today's session: which movements, what load and how many reps in each set.
+Protocol is a coach for building muscle. Open it before the gym and today's session is already decided: the movements, the exact weight and reps for every set, and how close to failure to take them. It learns from every set you log.
 
-<p><img src="assets/protocol.svg" width="100%" alt="How Protocol works: a training log of sets, check-ins and weigh-ins feeds an athlete model of seven parameters, each pulled from a population prior toward the athlete's data. The model derives today's sets with exact loads and reps, and the logged result feeds the next derivation."></p>
+<details>
+<summary>What it's like to use</summary>
 
-- Seven parameters fitted to each athlete's own data and shrunk toward population priors until the data can carry them
-- Exact load and reps for every set, corrected for how the athlete reports reps in reserve
-- Deloads fire on modelled fatigue debt, not on the calendar
-- The plan is recomputed from the log on every read, so it can never go stale
-- A focus engine fits circadian and caffeine models and runs randomised micro-trials where the evidence is contested
+- You pick the weekdays you train. Miss one and the session waits for you.
+- Tap the session title to train something else, and the rest of the week rearranges around it.
+- When a lift stalls, the plan changes the stimulus.
+- Deloads come from accumulated fatigue, so a hard month earns one and two easy weeks don't.
+- If you misjudge how many reps you had left, it learns your bias and corrects for it.
+- One goal sets both training and food, and calorie targets follow your bodyweight trend.
+- The Focus screen predicts how alert you'll be through the day from your sleep and caffeine, and checks itself now and then with a 3-minute reaction test. It places deep work, study, meetings and the workout where each fits best.
+- It works offline in the gym and syncs later.
+
+</details>
+
+<details>
+<summary>How it's built</summary>
+
+- The only stored data is an append-only log of sets, check-ins, weigh-ins and answers. The plan, loads, volume and calories are recomputed on every read, so a stale plan can't exist.
+- The athlete model has seven learned parameters: strength, fatigue, RIR calibration, dose-response, recovery, adherence and exercise affinity. Each starts at a population prior and moves toward your own data as the log grows, which keeps week one sane and month three personal.
+- The focus engine fits a ridge regression over 11 features, VIF-guarded and bootstrapped. Randomized micro-trials work through four unsettled questions, such as whether a walk beats a phone break, and a greedy planner re-simulates the day before each placement.
+- `src/core` is pure TypeScript with no React or database code. Vitest covers the engine, model, nutrition, sync and migrations.
+- It runs on Next.js 16 and React 19. Data lives offline-first in IndexedDB through Dexie and syncs to Upstash Redis behind a jose-signed http-only cookie.
+- Updates can't strand data. The schema only adds, backups restore from any version, sync merges as a union, and a migration leaves data alone when there's no honest equivalent.
+
+</details>
 
 ### Local LLMs and microcontrollers
 
-Self-hosted vision models behind a hardened gateway, and firmware for ESP32 and Arduino boards.
+I run open models on my own hardware and put them behind small, locked-down APIs. I also write firmware for ESP32 and Arduino boards that drive displays, touch input and cameras.
 
-<p><img src="assets/local-ai.svg" width="100%" alt="A client reaches a FastAPI gateway only through Tailscale Funnel. The gateway checks a hashed bearer token, rate limits, JPEG magic bytes and a 512 KB cap, then takes a GPU lock before calling Ollama on localhost. Below: an ESP32 sharing one SPI bus between an ILI9488 display and an XPT2046 touch controller, and an Arduino Uno held in reset as a USB-serial bridge to flash an ESP32-CAM."></p>
+<details>
+<summary>What it's like to use</summary>
 
-- Vision models served by Ollama, kept fully in VRAM, bound to localhost only
-- FastAPI gateway: SHA-256-hashed bearer tokens, per-token + global rate limits
-- One async GPU lock serialises inference; JPEG magic-byte + 512 KB body checks
-- Tailscale Funnel is the only way in; nothing listens on 0.0.0.0
-- ESP32 / ESP32-CAM / Arduino firmware in C++ with PlatformIO
-- SPI display + resistive touch sharing one bus, camera modules, flashing through a USB-serial bridge, 3.3 V / 5 V logic levels
+Nothing goes to a model provider, and there's no per-request bill. To an app, the setup looks like any hosted API: an HTTPS address, a key for each device, and requests that queue while the model is busy. Once flashed, the boards run on their own.
+
+</details>
+
+<details>
+<summary>How it's built</summary>
+
+- Ollama serves the models on localhost only.
+- A FastAPI gateway in front checks hashed bearer tokens, per-token and global rate limits, upload size and file signatures. An async lock lets one request run at a time.
+- Tailscale Funnel is the only way in, and no router ports are open.
+- Firmware is C++ with PlatformIO, for ESP32, ESP32-CAM and Arduino Uno boards across 3.3 V and 5 V logic.
+- SPI displays and resistive touch share one bus, with SD cards on a second.
+- An Uno doubles as a USB-serial bridge for flashing.
+
+</details>
 
 ### archvfinds
 
-A catalog of fashion finds. Shoppers browse brands, categories, outfits and QC photos, choose their buying agent once, and every product link opens in that agent.
+A catalog of fashion finds from archive labels and Instagram brands. Shoppers pick their buying agent once, and every product link on the site opens in that agent.
 
-<p><img src="assets/archvfinds.svg" width="100%" alt="How archvfinds works: brand hubs, category hubs, outfits and QC photos feed the site. The shopper's chosen agent turns each item ID into a ready agent link. A Discord bot and a first-party analytics panel sit alongside the site."></p>
+<p><a href="https://archvfinds.com"><img src="assets/archvfinds-home.svg" width="100%" alt="The archvfinds homepage, with the headline “Find the fit.” over a dark grid of product photos."></a></p>
 
-- Next.js site with brand, category and outfit pages, catalog search and a currency switcher
-- One product ID becomes a working link for whichever supported agent the shopper picked
-- A Discord bot posts a curated find, a poll and a QC pick every week, each linking back to the site
-- First-party analytics count visitors with a salted hash that rotates daily; IP addresses are never stored
+[archvfinds.com](https://archvfinds.com)
 
-<p><picture><source media="(prefers-color-scheme: dark)" srcset="assets/button-archvfinds-dark.svg"><a href="https://archvfinds.com"><img src="assets/button-archvfinds-light.svg" height="98" alt="archvfinds.com"></a></picture></p>
+<details>
+<summary>What it's like to use</summary>
 
-## Stack
+- The agents page compares every supported agent, and a 30-second quiz suggests one if you're unsure.
+- You can browse by brand, item type or outfit, or search the catalog. A filter shows only finds with QC photos.
+- Prices show in your currency, and there's no account to make.
+- A Discord bot posts a curated find on Monday, a cop-or-drop poll on Thursday and a QC pick on Saturday.
 
-<p><img src="https://skillicons.dev/icons?i=ae%2Cpr%2Cau%2Cblender%2Cpy%2Cvercel%2Cfastapi%2Chtml%2Ccss%2Cjs&theme=dark" alt="After Effects, Premiere Pro, Audition, Blender, Python, Vercel, FastAPI, HTML, CSS, JavaScript"></p>
+</details>
 
-### Currently learning
+<details>
+<summary>How it's built</summary>
 
-<p><img src="https://skillicons.dev/icons?i=cpp%2Cts%2Cnextjs&theme=dark" alt="C++, TypeScript, Next.js"></p>
+- The site is a static Next.js 15 export on Vercel, built from JSON, so no server runs when a page loads.
+- Brand and item-type hubs are generated from product names at build time.
+- One link builder handles every agent, each with its own URL encoding.
+- Analytics are first-party, in a separate panel app on Neon Postgres. Visitors are counted with a hash whose salt rotates daily. Nothing is stored on their device, and the raw IP never reaches the database. Events are rolled up nightly and deleted after 30 days.
+- The discord.js bot only posts products from an allowlist reviewed image by image. Polls keep vote counts and a voter hash scoped to each poll, so votes can't be linked across polls.
+
+</details>
