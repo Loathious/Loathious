@@ -2,7 +2,7 @@
 
 ## Overshoot
 
-I make motion for software: launch films, demo videos and product animation that moves the way a good interface feels to use. Everything is keyframed by hand in After Effects, often on real interfaces rebuilt layer by layer. Booking from Q1 2027.
+I make interfaces feel alive: the momentum in a swipe, the settle of a modal, the timing that makes an interaction read as considered, not default. The work is built directly on real product UI in After Effects, so what ships is motion designed for the interface it lives in, not a demo reel bolted onto it. Booking from Q1 2027.
 
 <p><a href="https://overshootfx.com"><img src="assets/overshoot-banner.svg" width="100%" alt="The Overshoot wordmark next to an icon of an animation curve that overshoots its target and settles."></a></p>
 
@@ -86,34 +86,27 @@ Cheap boards rarely match their listings. One was sold as an ESP32-C5 with a 2.8
 
 ### Local LLMs
 
-I wanted to use language models from my own apps and devices without sending data to a provider or paying per request. The models run on my own machine, behind a small API that's safe to put on the internet.
+I wanted to run language models from my own apps and devices without routing every request through someone else's server or paying per token. Ollama runs the models locally, sitting behind a small gateway that makes them look like any other API to whatever I'm building.
 
 <details>
 <summary>What it's like to use</summary>
 
-To an app it looks like any hosted API: an HTTPS address, a token for each device, and requests that queue while the model is busy. A lost device is locked out by revoking its token, which takes effect on the next request.
+To an app it looks like any hosted API: an address, a token per device, and requests that queue while the model works through them. Losing a device just means revoking its token, and the lockout takes effect on the next request.
 
 </details>
 
 <details>
 <summary>How it's built</summary>
 
-- Ollama serves the models on 127.0.0.1. A FastAPI gateway sits in front, and Tailscale Funnel is the only way in, with no router ports open.
-- ASGI middleware authenticates each request before the body is buffered. It checks Content-Length up front, then counts the streamed bytes and cuts the request off with a 413 once it passes the cap.
-- Tokens carry 32 bytes of entropy from `secrets.token_urlsafe`. Only their SHA-256 hashes are stored, and the plaintext is shown once.
-- Verification runs `secrets.compare_digest` against every stored hash without stopping at a match, so timing can't reveal which token matched. The token file is re-read on each call, so revoking a token needs no restart, and every write is atomic.
-- Rate limits are sliding-window deques per token and globally, per hour. A rejected request doesn't use up capacity.
-- Uploads must pass a file-signature check before they reach the model, and one asyncio lock serializes inference. Logs keep metadata and a hash of each upload, never the content.
-- The model client uses httpx with a timeout and one retry on connect or read errors, and returns 504 on a timeout and 503 when the model is down.
-- pytest covers issuing, verifying and revoking tokens, checks that plaintext never reaches disk, and tests the limiter: the window slides, rejected requests don't count, and buckets stay separate.
+Running models locally starts as an economic choice: once inference runs on hardware you already own, it's free, and using a model stops being a metered decision. Privacy comes along for free too, since nothing ever leaves the machine. And the gap that used to justify paying for frontier access keeps narrowing: open models now handle most everyday tasks well enough that reaching for a paid API is often just habit.
 
 </details>
 
 ### Archvfinds
 
-Finds get shared as links, but every buying agent needs its own link format, so a link that works for one shopper breaks for the next. The sites that collected finds didn't help either. Most were cluttered, slow or hard to trust.
+Cross-border shopping runs on buying agents: services that purchase from Chinese marketplaces like Taobao and Weidian, since those platforms don't ship internationally on their own, then inspect the order and forward it. Every agent runs its own storefront with its own link format, so a product link that opens cleanly through one agent is dead on arrival for a shopper using another, and the sites that tried to catalog finds across agents were slow, cluttered, or just not worth trusting.
 
-Archvfinds is the catalog I wanted to use: fashion finds from archive labels and Instagram brands on a fast static site. Pick your buying agent once, and every product link on the site opens in that agent.
+Archvfinds is the catalog I wanted: fashion finds from archive labels and Instagram brands, built on a fast static site with one link system underneath. Pick a buying agent once, and every product link on the site resolves through it automatically.
 
 <p><a href="https://archvfinds.com"><img src="assets/archvfinds-home.svg" width="100%" alt="The Archvfinds homepage, with the headline “Find the fit.” over dark product photos."></a></p>
 
@@ -123,7 +116,7 @@ Archvfinds is the catalog I wanted to use: fashion finds from archive labels and
 <summary>What it's like to use</summary>
 
 - The agents page compares every supported agent, and a 30-second quiz suggests one if you're unsure.
-- You can browse by brand, item type or outfit, or search the catalog. A filter shows only finds with QC photos.
+- You can browse by brand, item type or outfit, or search the catalog. A filter shows only finds with QC photos, the warehouse photos an agent takes before an order ships.
 - Prices show in your currency, and there's no account to make.
 - A Discord bot posts a curated find on Monday, a cop-or-drop poll on Thursday and a QC pick on Saturday.
 
@@ -132,16 +125,12 @@ Archvfinds is the catalog I wanted to use: fashion finds from archive labels and
 <details>
 <summary>How it's built</summary>
 
-- The site is a static Next.js 15 export on Vercel, built from JSON, so no server runs when a page loads. Ordered matchers derive each product's brand and item type from its name at build time, and the brand and category hubs are generated from those.
-- One link builder covers every agent, each with its own mix of path segments, query parameters and single or double URL encoding, plus a fallback for links it can't convert.
-- Sorting by popularity decays repeat brands and interleaves categories, so one label can't take over a page.
-- Analytics are first-party. The tracker keeps a per-tab session ID in sessionStorage, sets no cookies, writes nothing to localStorage, and only runs on the production hostname.
-- A separate panel app on Neon Postgres counts visitors as `sha256(salt|day|ip|ua)` cut to 32 hex characters, with a salt that rotates at midnight UTC. The raw IP is never stored.
-- Its collect endpoint checks an origin allowlist, accepts at most 20 events and 16 KB per request, and writes them in one multi-row insert. An insert-if-absent CTE on `visitor_seen` keeps a visitor from being counted twice.
-- A cron job at 03:10 UTC rebuilds the daily rollups with an idempotent delete-then-insert and logs each run. Raw events are purged after 30 days and `visitor_seen` after 3.
-- The discord.js bot checks every 30 seconds for a due slot at 19:00 Swedish time. Each slot is keyed by date and kind, so a restart can't double-post, and state is written atomically through a temp file and a rename.
-- Posts come from a hand-approved pool validated against the live catalog. A Fisher–Yates queue never opens with the product it just posted and holds back a find from the same brand as the previous post.
-- Poll votes are stored as `sha256(messageId:userId)`, so one person hashes differently on every poll. Changing a vote moves the count, and voter hashes are deleted after 30 days while the totals stay.
-- Discord doesn't replay events a bot missed, so the bot snapshots members to disk and diffs them at startup to catch anyone who left while it was offline. Failed sends to the panel wait in a disk queue and retry.
+- The site is a static Next.js 15 export on Vercel, built from JSON, so no server runs when a page loads. Build-time matchers infer each product's brand and item type from its name, and those inferences generate the brand and category hub pages automatically.
+- One link builder covers every agent, translating each product into that agent's own mix of path segments, query parameters and URL encoding, with a fallback for the links it can't convert.
+- Sorting by popularity decays repeat brands and interleaves categories, so no single label can dominate a page.
+- Analytics are first-party and privacy-first: a per-tab session id lives only in sessionStorage, no cookies get set, and nothing is tracked outside the production site. A separate panel counts visits as a rotating, salted hash of IP and day, so a unique visitor can be counted without the IP itself ever being stored.
+- The Discord bot checks every 30 seconds for a scheduled post and never double-posts, since each slot is keyed by date and a restart picks up exactly where it left off. A Fisher–Yates queue also keeps the same brand from posting twice in a row.
+- Poll votes are hashed per message and per voter, so the same person votes differently on every poll while the totals stay honest, and the voter hashes themselves age out after 30 days.
+- Discord doesn't replay events a bot missed, so it snapshots its member list to disk and diffs it on startup to catch anyone who left while it was offline.
 
 </details>
