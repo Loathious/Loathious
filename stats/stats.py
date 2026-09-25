@@ -40,11 +40,12 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "assets", "stats.svg")
 FONTS = os.path.join(ROOT, "stats", "fonts")
 
-W, PAD = 520, 24
+W, H = 1200, 400           # the same 3:1 frame as the other images in the README
+X0, X1 = 72, 1128
 C = dict(bg="#0f0b0a", line="#2c1f1c", text="#f0e6da", dim="#a09286", faint="#76675e",
-         bar="#b8402b", now="#e3a863")
-LANG_COLORS = ["#d44a31", "#e3a863", "#9e2b1e", "#c7813b", "#f0e6da"]
-OTHER_COLOR = "#4a3632"
+         ember="#c7813b", bar="#b8402b", peak="#e3a863")
+LANG_COLORS = ["#9e2b1e", "#b8402b", "#d44a31", "#c7813b", "#e3a863"]
+OTHER_COLOR = "#76675e"
 MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
 SANS = 'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif'
 
@@ -214,18 +215,20 @@ def fmt(v):
 
 def font_css():
     css = []
-    for weight in (400, 500):
+    for weight in (400, 500, 600):
         with open(os.path.join(FONTS, f"geist-{weight}.woff2"), "rb") as fh:
             b64 = base64.b64encode(fh.read()).decode()
         css.append(f"@font-face{{font-family:G{weight};font-weight:{weight};"
                    f'src:url(data:font/woff2;base64,{b64}) format("woff2")}}')
     css.append(f"text{{font-family:G400,{SANS};font-weight:400;fill:{C['dim']}}}")
+    css.append(f".h{{font-family:G600,{SANS};font-weight:600;fill:{C['text']}}}")
+    css.append(f".s{{font-family:G500,{SANS};font-weight:500;fill:{C['ember']}}}")
     css.append(f".b{{font-family:G500,{SANS};font-weight:500;fill:{C['text']}}}")
     css.append(f".f{{fill:{C['faint']}}}")
     return "".join(css)
 
 
-def bar(x, y, w, h, fill, r=2.0):
+def bar(x, y, w, h, fill, r=3.0):
     """A bar with rounded top corners."""
     r = min(r, w / 2, h)
     return (f'<path d="M{fmt(x)} {fmt(y + h)}V{fmt(y + r)}Q{fmt(x)} {fmt(y)} {fmt(x + r)} {fmt(y)}'
@@ -245,36 +248,37 @@ def render(dates, loc, repos, today):
         parts.append(("Other", rest, OTHER_COLOR))
     pct = [f"{n / lines * 100:.1f}%" for _, n, _ in parts]
 
-    y1, y2 = 40, 62          # sentence baselines
-    c0, c1 = 92, 140         # bar chart top and baseline
-    my = 158                 # month labels
-    ly = 176                 # language bar
-    gy = 206                 # first legend row
-    rows = (len(parts) + 2) // 3
-    H = gy + (rows - 1) * 22 + 24
-    cw = W - 2 * PAD
+    headline = f"{num(commits)} {plural(commits, 'commit')} and {kilo(lines)} lines of code"
+    hs = min(46, int((X1 - X0) / (0.62 * len(headline))))   # Geist 600 runs under 0.62 em a character here
+    y1, y2 = 100, 140        # headline and subline baselines
+    c0, c1 = 200, 296        # bar chart top and baseline
+    cx1 = 584                # bar chart right edge
+    my = 328                 # month labels, level with the last legend row
+    lx = 640                 # languages column
+    lh = 36                  # legend row spacing
 
-    els = [f'<rect x="0.5" y="0.5" width="{W - 1}" height="{H - 1}" rx="8" fill="{C["bg"]}" stroke="{C["line"]}"/>']
-    els.append(f'<text x="{PAD}" y="{y1}" font-size="16"><tspan class="b">{num(commits)}</tspan> '
-               f'{plural(commits, "commit")} and <tspan class="b">{kilo(lines)}</tspan> lines of code</text>')
-    els.append(f'<text x="{PAD}" y="{y2}" font-size="16">across <tspan class="b">{repos}</tspan> '
+    els = [f'<rect x="0.75" y="0.75" width="{W - 1.5}" height="{H - 1.5}" rx="11.25" '
+           f'fill="{C["bg"]}" stroke="{C["line"]}" stroke-width="1.5"/>']
+    els.append(f'<text class="h" x="{X0}" y="{y1}" font-size="{hs}" letter-spacing="{fmt(-0.02 * hs)}">'
+               f'{escape(headline)}</text>')
+    els.append(f'<text class="s" x="{X0}" y="{y2}" font-size="30" letter-spacing="-0.3">across {repos} '
                f'{plural(repos, "repository", "repositories")} since {since}</text>')
-    els.append(f'<text x="{W - PAD}" y="{y1}" font-size="12" class="f" text-anchor="end">Updated {day(today)}</text>')
+    els.append(f'<text class="f" x="{X1}" y="{y2}" font-size="22" text-anchor="end">Updated {day(today)}</text>')
 
     # commits per week
-    slot = cw / len(weeks)
-    bw = max(2.0, min(slot * 0.62, 14.0))
+    slot = (cx1 - X0) / len(weeks)
+    bw = max(2.0, min(slot * 0.62, 18.0))
     peak = max(weeks)
     peak_i = weeks.index(peak)
     for i, n in enumerate(weeks):
-        x = PAD + i * slot + (slot - bw) / 2
+        x = X0 + i * slot + (slot - bw) / 2
         if n:
-            h = max(2.0, (c1 - c0) * n / peak)
-            els.append(bar(x, c1 - h, bw, h, C["now"] if i == len(weeks) - 1 else C["bar"]))
+            h = max(3.0, (c1 - c0) * n / peak)
+            els.append(bar(x, c1 - h, bw, h, C["peak"] if i == peak_i else C["bar"]))
         else:
-            els.append(f'<rect x="{fmt(x)}" y="{c1 - 2}" width="{fmt(bw)}" height="2" fill="{C["line"]}"/>')
-    px = PAD + peak_i * slot + slot / 2
-    els.append(f'<text x="{fmt(px)}" y="{c0 - 7}" font-size="11" class="f" text-anchor="middle">{peak}</text>')
+            els.append(f'<rect x="{fmt(x)}" y="{c1 - 3}" width="{fmt(bw)}" height="3" fill="{C["line"]}"/>')
+    px = X0 + peak_i * slot + slot / 2
+    els.append(f'<text class="b" x="{fmt(px)}" y="{c0 - 12}" font-size="20" text-anchor="middle">{peak}</text>')
 
     labels = []
     for i in range(len(weeks)):
@@ -284,31 +288,31 @@ def render(dates, loc, repos, today):
             labels.append((i, firsts[0].month))
         elif i == 0:
             labels.append((i, (wk + dt.timedelta(days=3)).month))
-    xs = [PAD + i * slot + (slot - bw) / 2 for i, _ in labels]
-    if len(xs) > 1 and labels[0][0] == 0 and xs[1] - xs[0] < 34:
+    xs = [X0 + i * slot + (slot - bw) / 2 for i, _ in labels]
+    if len(xs) > 1 and labels[0][0] == 0 and xs[1] - xs[0] < 64:
         labels, xs = labels[1:], xs[1:]
     last = -1e9
     for (i, m), x in zip(labels, xs):
-        if x - last >= 34:
-            els.append(f'<text x="{fmt(x)}" y="{my}" font-size="11" class="f">{MONTHS[m - 1]}</text>')
+        if x - last >= 64:
+            els.append(f'<text class="f" x="{fmt(x)}" y="{my}" font-size="20">{MONTHS[m - 1]}</text>')
             last = x
 
-    # languages
-    els.append(f'<clipPath id="lang"><rect x="{PAD}" y="{ly}" width="{cw}" height="8" rx="4"/></clipPath>')
-    gap = 2
-    avail = cw - gap * (len(parts) - 1)
-    x, segs = float(PAD), []
+    # languages: one bar, then two columns of three
+    ly, lw = c0, X1 - lx
+    els.append(f'<clipPath id="lang"><rect x="{lx}" y="{ly}" width="{lw}" height="12" rx="6"/></clipPath>')
+    gap = 4
+    avail = lw - gap * (len(parts) - 1)
+    x, segs = float(lx), []
     for name, n, col in parts:
         w = avail * n / lines
-        segs.append(f'<rect x="{fmt(x)}" y="{ly}" width="{fmt(w)}" height="8" fill="{col}"/>')
+        segs.append(f'<rect x="{fmt(x)}" y="{ly}" width="{fmt(w)}" height="12" fill="{col}"/>')
         x += w + gap
     els.append(f'<g clip-path="url(#lang)">{"".join(segs)}</g>')
-    col_w = cw / 3
     for i, ((name, n, col), p) in enumerate(zip(parts, pct)):
-        x = PAD + (i % 3) * col_w
-        y = gy + (i // 3) * 22
-        els.append(f'<circle cx="{fmt(x + 4)}" cy="{y - 4}" r="4" fill="{col}"/>')
-        els.append(f'<text x="{fmt(x + 14)}" y="{y}" font-size="13"><tspan class="b">{escape(name)}</tspan> {p}</text>')
+        x = lx + (i // 3) * lw / 2
+        y = my - (2 - i % 3) * lh
+        els.append(f'<rect x="{fmt(x)}" y="{y - 15}" width="14" height="14" rx="3" fill="{col}"/>')
+        els.append(f'<text x="{fmt(x + 24)}" y="{y}" font-size="22"><tspan class="b">{escape(name)}</tspan> {p}</text>')
 
     summary = (f"{num(commits)} {plural(commits, 'commit')} and {kilo(lines)} lines of code across {repos} "
                f"{plural(repos, 'repository', 'repositories')} since {since}. Busiest week: {peak} "

@@ -1,8 +1,8 @@
 <p><img src="assets/header.svg" width="100%" alt="Hi 👋, I'm Alfred. Student, VFX artist, SaaS animation, AI."></p>
 
-<p><b>Stack</b><br><img src="https://skillicons.dev/icons?i=ae%2Cpr%2Cau%2Cblender%2Cpy%2Cvercel%2Cfastapi%2Chtml%2Ccss%2Cjs&theme=dark" width="462" alt="After Effects, Premiere Pro, Audition, Blender, Python, Vercel, FastAPI, HTML, CSS, JavaScript"></p>
+<p><b>Stack</b><br><img src="assets/stack.svg" width="462" alt="After Effects, Premiere Pro, Audition, Blender, Python, Vercel, FastAPI, HTML, CSS, JavaScript"></p>
 
-<p><b>Learning</b><br><img src="https://skillicons.dev/icons?i=cpp%2Cts%2Cnextjs&theme=dark" width="134" alt="C++, TypeScript, Next.js"></p>
+<p><b>Learning</b><br><img src="assets/learning.svg" width="462" alt="C++, TypeScript, Next.js"></p>
 
 ## Overshoot
 
@@ -14,7 +14,7 @@ I make motion for software: launch films, demo videos and product animation that
 
 ## Selected projects
 
-<p><img src="assets/stats.svg" alt="Commit and language stats across my repositories, updated daily."></p>
+<p><img src="assets/stats.svg" width="100%" alt="Commit and language stats across my repositories, updated daily."></p>
 
 ### Protocol
 
@@ -73,7 +73,7 @@ Nothing goes to a model provider, and there's no per-request bill. To an app, th
 
 A catalog of fashion finds from archive labels and Instagram brands. Shoppers pick their buying agent once, and every product link on the site opens in that agent.
 
-<p><a href="https://archvfinds.com"><img src="assets/archvfinds-home.svg" width="100%" alt="The archvfinds homepage, with the headline “Find the fit.” over a dark grid of product photos."></a></p>
+<p><a href="https://archvfinds.com"><img src="assets/archvfinds-home.svg" width="100%" alt="The archvfinds homepage, with its navigation bar and the headline “Find the fit.” over dark product photos."></a></p>
 
 [archvfinds.com](https://archvfinds.com)
 
