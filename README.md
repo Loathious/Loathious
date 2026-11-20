@@ -48,7 +48,7 @@ Local dictation and private meeting notes for Windows. Hold a shortcut, speak, a
 - Electron overlay: a floating pill that rests at the screen edge and opens when your cursor comes near.
 - Personal vocabulary that learns names and terms, plus meeting recording, voice notes and searchable history.
 - Optional cleanup of longer dictations with a local model through Ollama.
-- English and Swedish, automated testing and a per-user Windows installer.
+- Automated testing and a per-user Windows installer.
 
 </details>
 
