@@ -37,6 +37,23 @@ A personal training and performance system built around adaptive programming. Pr
 
 [Try Protocol](https://protocol-xi-six.vercel.app/)
 
+### Syllune
+
+Local dictation and private meeting notes for Windows. Hold a shortcut, speak, and Syllune types what you said wherever your cursor is. Speech recognition runs entirely on your own computer, so nothing is uploaded, there is no account, and it works offline.
+
+<details>
+<summary>How it's built</summary>
+
+- Python speech engine built on faster-whisper, using an NVIDIA GPU when available and the CPU otherwise.
+- Electron overlay: a floating pill that rests at the screen edge and opens when your cursor comes near.
+- Personal vocabulary that learns names and terms, plus meeting recording, voice notes and searchable history.
+- Optional cleanup of longer dictations with a local model through Ollama.
+- English and Swedish, automated testing and a per-user Windows installer.
+
+</details>
+
+[Download Syllune](https://github.com/Loathious/Syllune/releases)
+
 ### Archvfinds
 
 A fashion discovery platform bringing together archive labels, independent brands and cross-border shopping. One catalog, multiple buying agents, and a unified link system that makes the entire experience seamless.
