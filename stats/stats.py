@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 """Draw assets/stats.svg from my commits and the code in my repositories.
 
-The Stats workflow runs this every night with two repository secrets:
-STATS_REPOS, the repository names separated by commas, and STATS_TOKEN, a
-fine-grained token with read-only Contents access to those repositories.
-The names stay out of this public repository and its logs.
+The Stats workflow runs this every night with the repository secret
+STATS_TOKEN, a fine-grained token with read-only Contents access to my
+repositories, public and private. Every repository it can read that I own,
+forks aside, goes into the card. The optional secret STATS_REPOS, names
+separated by commas, narrows that to a fixed list.
+
+Only totals reach the card: commits per week, lines per language and how
+many repositories. Names stay out of this public repository and its logs,
+and a commit or file found in two repositories counts once.
 
     python3 stats/stats.py                        # blobless clones from GitHub
     python3 stats/stats.py --local NAME=PATH ...  # existing clones, at their origin branch
@@ -15,11 +20,14 @@ import argparse
 import base64
 import collections
 import datetime as dt
+import json
 import os
 import re
 import subprocess
 import sys
 import tempfile
+import urllib.error
+import urllib.request
 from xml.sax.saxutils import escape
 
 OWNER = "Loathious"
@@ -108,23 +116,28 @@ def language(path):
     return LANGS.get(os.path.splitext(parts[-1])[1].lower())
 
 
-def commit_dates(repo, ref, env=None):
+def commits(repo, ref, env=None):
+    """(hash, date) for each of my commits reachable from ref."""
     out = git(repo, "log", ref, "--fixed-strings", f"--author={AUTHOR}",
-              "--format=%ad", "--date=short", env=env)
-    return [dt.date.fromisoformat(d) for d in out.decode().split()]
+              "--format=%H %ad", "--date=short", env=env)
+    return [(sha, dt.date.fromisoformat(d)) for sha, d in
+            (line.split() for line in out.decode().splitlines() if line.strip())]
 
 
-def code_lines(repo, ref, env=None):
-    """Non-blank lines per language in the files at ref."""
+def code_lines(repo, ref, env=None, seen=None):
+    """Non-blank lines per language in the files at ref, skipping file
+    contents already counted (their object ids are in seen)."""
+    seen = set() if seen is None else seen
     wanted = []
     for entry in git(repo, "ls-tree", "-r", "-z", ref, env=env).split(b"\0"):
         if not entry:
             continue
         meta, path = entry.split(b"\t", 1)
         mode, kind, oid = meta.split()
-        if kind == b"blob" and mode != b"120000":
+        if kind == b"blob" and mode != b"120000" and oid not in seen:
             lang = language(path.decode("utf-8", "replace"))
             if lang:
+                seen.add(oid)
                 wanted.append((oid, lang))
     counts = collections.Counter()
     if not wanted:
@@ -145,16 +158,51 @@ def code_lines(repo, ref, env=None):
 
 
 def collect(sources, env=None):
-    dates, loc = [], collections.Counter()
+    """Commit dates, lines per language and the number of repositories that
+    added anything. A commit or file seen in an earlier repository (a copy or
+    a renamed duplicate) is not counted again."""
+    dates, loc, used = [], collections.Counter(), 0
+    seen_commits, seen_blobs = set(), set()
     for label, repo, ref in sources:
         try:
-            d, c = commit_dates(repo, ref, env), code_lines(repo, ref, env)
+            new = [(sha, d) for sha, d in commits(repo, ref, env) if sha not in seen_commits]
+            c = code_lines(repo, ref, env, seen_blobs)
         except GitError as err:
             raise GitError(f"{label}: {err}") from None
-        print(f"{label}: {len(d)} commits, {sum(c.values())} lines", file=sys.stderr)
-        dates += d
+        seen_commits.update(sha for sha, _ in new)
+        print(f"{label}: {len(new)} commits, {sum(c.values())} lines", file=sys.stderr)
+        if new or c:
+            used += 1
+        dates += [d for _, d in new]
         loc.update(c)
-    return dates, loc
+    return dates, loc, used
+
+
+def discover(token):
+    """Every repository the token can read that I own, forks aside. Names are
+    only returned, never printed."""
+    names = []
+    url = "https://api.github.com/user/repos?affiliation=owner&per_page=100"
+    while url:
+        req = urllib.request.Request(url, headers={
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+            "User-Agent": "profile-stats",
+        })
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                page, link = json.load(resp), resp.headers.get("Link") or ""
+        except urllib.error.HTTPError as err:
+            raise GitError(f"Listing repositories failed with HTTP {err.code}.\n"
+                           "Check that STATS_TOKEN has not expired.") from None
+        except urllib.error.URLError as err:
+            raise GitError(scrub(f"Listing repositories failed: {err.reason}")) from None
+        names += [r["name"] for r in page
+                  if r["owner"]["login"].lower() == OWNER.lower() and not r["fork"]]
+        nxt = re.search(r'<([^>]+)>;\s*rel="next"', link)
+        url = nxt.group(1) if nxt else None
+    return sorted(set(names), key=str.lower)
 
 
 def from_github(names, token):
@@ -169,6 +217,11 @@ def from_github(names, token):
             except GitError as err:
                 raise GitError(f"{label}: {err}\nCheck that STATS_TOKEN has not expired "
                                "and can read this repository.") from None
+            empty = subprocess.run(["git", "-C", repo, "rev-parse", "--verify", "--quiet", "HEAD^{commit}"],
+                                   capture_output=True).returncode
+            if empty:
+                print(f"{label}: empty, skipped", file=sys.stderr)
+                continue
             sources.append((label, repo, ref))
         return collect(sources, env)
 
@@ -345,17 +398,20 @@ def main():
                 if not name or not path:
                     ap.error(f"expected NAME=PATH, got {arg!r}")
                 sources.append((name, *origin_ref(path)))
-            dates, loc = collect(sources)
-            repos = len(sources)
+            dates, loc, repos = collect(sources)
         else:
             token = os.environ.get("STATS_TOKEN", "").strip()
+            if not token:
+                sys.exit("Set the STATS_TOKEN secret first. assets/stats.svg was left as it was.")
+            SECRETS.append(token)
             names = [n.rsplit("/", 1)[-1] for n in re.findall(r"[^\s,]+", os.environ.get("STATS_REPOS", ""))]
-            if not token or not names:
-                sys.exit("Set the STATS_TOKEN and STATS_REPOS secrets first. assets/stats.svg was left as it was.")
             if not all(re.fullmatch(r"[\w.-]+", n) for n in names):
                 sys.exit("STATS_REPOS should list repository names separated by commas.")
-            dates, loc = from_github(names, token)
-            repos = len(names)
+            names = names or discover(token)
+            if not names:
+                sys.exit("STATS_TOKEN can read none of my repositories. assets/stats.svg was left as it was.")
+            print(f"Reading {len(names)} {plural(len(names), 'repository', 'repositories')}", file=sys.stderr)
+            dates, loc, repos = from_github(names, token)
     except GitError as err:
         sys.exit(f"{err}\nassets/stats.svg was left as it was.")
     if not dates or not loc:
